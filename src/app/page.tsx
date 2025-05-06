@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 import Link from "next/link";
 import { SkeletonTable } from "@/components/SkeletonLoader";
 
-export const Home = () => {
+const Home = () => {
 	const [dataMahasiswa, setDataMahasiswa] = useState<Mahasiswa[]>([])
 	const [isLoading, setIsLoading] = useState<boolean>(true)
 
