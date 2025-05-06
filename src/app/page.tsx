@@ -1,103 +1,126 @@
+"use client"
+
 import Image from "next/image";
+import { DataTable } from "@/components/DataTable";
+import { columns, Mahasiswa } from "@/components/Columns";
+import AddNewMahasiswa from "@/components/AddNewMahasiswa";
+import { useEffect, useState } from "react";
+import { getMahasiswa } from "@/action/mahasiswa.action";
+import toast from "react-hot-toast";
+import Link from "next/link";
+import { SkeletonTable } from "@/components/SkeletonLoader";
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+export const Home = () => {
+	const [dataMahasiswa, setDataMahasiswa] = useState<Mahasiswa[]>([])
+	const [isLoading, setIsLoading] = useState<boolean>(true)
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+	useEffect(() => {
+		const fetchData = async () => {
+			const res = await getMahasiswa()
+
+			if (res.success) {
+				setDataMahasiswa(res.data!)
+			} else {
+				toast.error("Gagal mengambil data mahasiswa", {
+					duration: 3000,
+					ariaProps: {
+						role: 'alert',
+						"aria-live": 'polite'
+					}
+				})
+			}
+
+			setIsLoading(false)
+		}
+
+		fetchData()
+	}, [])
+
+	const onAddMahasiswa = (newData: Mahasiswa) => {
+		setDataMahasiswa(prev => ([
+			...prev,
+			newData
+		]))
+	}
+
+	const onUpdateMahasiswa = (updatedData: Mahasiswa) => {
+		setDataMahasiswa(prev =>
+			prev.map(obj => obj.id === updatedData.id ? updatedData : obj)
+		)
+	}
+
+	return (
+		<div className="flex flex-col min-h-screen p-4 sm:p-8 font-[family-name:var(--font-geist-sans)]">
+			<header className="w-full border-b py-4 mb-6">
+				<div className="mx-auto max-w-6xl flex items-center justify-between px-4 sm:px-8">
+					<h1 className="text-xl font-bold tracking-tight text-primary">
+						Sistem Data Mahasiswa
+					</h1>
+					<nav className="flex items-center text-sm text-muted-foreground space-x-1">
+						<Link href="/" className="hover:underline hover:underline-offset-4">
+							Home
+						</Link>
+						<span>/</span>
+						<span className="text-foreground">Dashboard</span>
+					</nav>
+				</div>
+			</header>
+
+			<main className="flex-1 w-full overflow-auto">
+				<div className="mx-auto max-w-6xl">
+					<div className="w-full">
+						<AddNewMahasiswa onSuccess={onAddMahasiswa} />
+						{isLoading ? (
+							<SkeletonTable
+								columnCount={6}
+								rowCount={7}
+							/>
+						) : (
+							<DataTable
+								data={dataMahasiswa}
+								columns={columns(onUpdateMahasiswa)}
+							/>
+						)}
+					</div>
+				</div>
+			</main>
+
+
+			<footer className="mt-8 flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
+				<p>© {new Date().getFullYear()} Patra Rafles Wostyla Sinaga. All rights reserved.</p>
+				<Link
+					href="https://github.com/RaplesWojtyla"
+					target="_blank"
+					rel="noopener noreferrer"
+					className="flex items-center gap-2 hover:underline hover:underline-offset-4"
+				>
+					<Image
+						src="/github.png"
+						alt="GitHub icon"
+						width={16}
+						height={16}
+						aria-hidden
+					/>
+					GitHub
+				</Link>
+				<Link
+					href="https://www.linkedin.com/in/wojtylakarma"
+					target="_blank"
+					rel="noopener noreferrer"
+					className="flex items-center gap-2 hover:underline hover:underline-offset-4"
+				>
+					<Image
+						src="/linkedin.png"
+						alt="LinkedIn icon"
+						width={16}
+						height={16}
+						aria-hidden
+					/>
+					LinkedIn
+				</Link>
+			</footer>
+		</div>
+	);
 }
+
+export default Home
