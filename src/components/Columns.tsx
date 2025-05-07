@@ -5,13 +5,11 @@ import { ArrowUpDown, MoreHorizontal, Trash } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog"
-import { Input } from "./ui/input"
-import { Label } from "./ui/label"
 import React, { useState } from "react"
 import UpdateForm from "./UpdateForm"
 import toast from "react-hot-toast"
-import { updateMahasiswa } from "@/action/mahasiswa.action"
+import { deleteMahasiswa, updateMahasiswa } from "@/action/mahasiswa.action"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog"
 
 
 export type Mahasiswa = {
@@ -24,7 +22,10 @@ export type Mahasiswa = {
 }
 
 // export const columns: ColumnDef<Mahasiswa>[] = [
-export const columns = (onUpdate: (updated: Mahasiswa) => void): ColumnDef<Mahasiswa>[] => [
+export const columns = (
+	onUpdate: (updated: Mahasiswa) => void,
+	onDelete: (id: string) => void
+): ColumnDef<Mahasiswa>[] => [
 	{
 		id: "select",
 		header: ({ table }) => (
@@ -67,8 +68,8 @@ export const columns = (onUpdate: (updated: Mahasiswa) => void): ColumnDef<Mahas
 		header: ({ column }) => {
 			return (
 				<Button
-				variant="ghost"
-				onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+					variant="ghost"
+					onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
 				>
 					Nama
 					<ArrowUpDown />
@@ -117,7 +118,7 @@ export const columns = (onUpdate: (updated: Mahasiswa) => void): ColumnDef<Mahas
 				}))
 			}
 
-			const handleSubmit = async () => {
+			const handleUpdate = async () => {
 				setIsLoading(true)
 
 				try {
@@ -133,6 +134,14 @@ export const columns = (onUpdate: (updated: Mahasiswa) => void): ColumnDef<Mahas
 						})
 
 						onUpdate(res.data)
+					} else {
+						toast.error(res.message, {
+							duration: 4500,
+							ariaProps: {
+								role: 'alert',
+								"aria-live": 'polite'
+							}
+						})
 					}
 				} catch (e: any) {
 					console.error(e)
@@ -146,6 +155,46 @@ export const columns = (onUpdate: (updated: Mahasiswa) => void): ColumnDef<Mahas
 					})
 				} finally {
 					setIsLoading(false)
+				}
+			}
+
+			const handleDelete = async (id: string) => {
+				const toastID = toast.loading("Menghapus...")
+
+				try {
+					const res = await deleteMahasiswa(id)
+
+					if (res.success) {
+						toast.success(res.message, {
+							id: toastID,
+							duration: 4500,
+							ariaProps: {
+								role: 'status',
+								"aria-live": 'polite'
+							}
+						})
+
+						onDelete(id)
+					} else {
+						toast.error(res.message, {
+							id: toastID,
+							duration: 4500,
+							ariaProps: {
+								role: 'alert',
+								"aria-live": 'polite'
+							}
+						})
+					}
+				} catch (error) {
+					console.error(error)
+
+					toast.error('Internal Server Error', {
+						duration: 3000,
+						ariaProps: {
+							role: 'status',
+							"aria-live": 'polite'
+						}
+					})
 				}
 			}
 
@@ -168,13 +217,33 @@ export const columns = (onUpdate: (updated: Mahasiswa) => void): ColumnDef<Mahas
 							updateMahasiswa={updateDataMahasiswa}
 							isLoading={isLoading}
 							handleChange={handleChange}
-							handleSubmit={handleSubmit}
+							handleSubmit={handleUpdate}
 						/>
 
-						<DropdownMenuItem>
-							<Trash className="text-red-500" />
-							<span className="text-red-500 uppercase font-semibold">Delete</span>
-						</DropdownMenuItem>
+						<AlertDialog>
+							<AlertDialogTrigger className="flex items-center gap-2 text-sm px-2 py-1.5 hover:bg-gray-100 rounded-sm w-full">
+								<Trash className="text-red-500 size-4" />
+								<span className="text-red-500 uppercase font-semibold">Delete</span>
+							</AlertDialogTrigger>
+							<AlertDialogContent>
+								<AlertDialogHeader>
+									<AlertDialogTitle>Apakah anda benar-benar yakin?</AlertDialogTitle>
+									<AlertDialogDescription>Aksi ini tidak akan dapat dibatalkan. Data mahasiswa tersebut akan hilang secara permanen.</AlertDialogDescription>
+								</AlertDialogHeader>
+								<AlertDialogFooter>
+									<AlertDialogCancel>Cancel</AlertDialogCancel>
+									<AlertDialogAction asChild>
+										<Button 
+											className="bg-red-500 hover:bg-red-600 transition duration-300"
+											onClick={() => handleDelete(mahasiswa.id)}	
+										>
+											Delete
+										</Button>
+									</AlertDialogAction>
+								</AlertDialogFooter>
+							</AlertDialogContent>
+						</AlertDialog>
+
 					</DropdownMenuContent>
 				</DropdownMenu>
 			)

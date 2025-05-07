@@ -49,6 +49,12 @@ const Home = () => {
 		)
 	}
 
+	const onDeleteMahasiswa = (id: string) => {
+		setDataMahasiswa(prev => 
+			prev.filter(obj => obj.id !== id)
+		)
+	}
+
 	return (
 		<div className="flex flex-col min-h-screen p-4 sm:p-8 font-[family-name:var(--font-geist-sans)]">
 			<header className="w-full border-b py-4 mb-6">
@@ -78,7 +84,7 @@ const Home = () => {
 						) : (
 							<DataTable
 								data={dataMahasiswa}
-								columns={columns(onUpdateMahasiswa)}
+								columns={columns(onUpdateMahasiswa, onDeleteMahasiswa)}
 							/>
 						)}
 					</div>

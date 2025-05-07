@@ -4,7 +4,8 @@ import { Input } from "./ui/input"
 import { Label } from "./ui/label"
 import { Button } from "./ui/button"
 import { Mahasiswa } from "./Columns"
-import { Loader2 } from "lucide-react"
+import { AlertCircle, Loader2 } from "lucide-react"
+import { Alert, AlertDescription, AlertTitle } from "./ui/alert"
 
 const UpdateForm = ({
 	updateMahasiswa,
@@ -51,15 +52,22 @@ const UpdateForm = ({
 						</div>
 					))}
 				</div>
+				<Alert className="text-yellow-400 border-yellow-300  mt-5">
+					<AlertCircle className="size-4" />
+					<AlertTitle>Warning!</AlertTitle>
+					<AlertDescription className="text-yellow-500">
+						Harap pastikan mengisi data mahasiswa dengan benar.
+					</AlertDescription>
+				</Alert>
 				<DialogFooter>
 					<Button
-						className="bg-green-500 hover:bg-green-600 transition duration-300" 
-						type="submit" 
+						className="bg-green-500 hover:bg-green-600 transition duration-300"
+						type="submit"
 						onClick={handleSubmit}
 					>
 						{isLoading ? (
 							<Loader2 className="animate-spin size-4" />
-						) : "Simpan Perubahan" }
+						) : "Simpan Perubahan"}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

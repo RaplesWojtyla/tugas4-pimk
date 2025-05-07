@@ -40,6 +40,27 @@ export const SkeletonTable = ({ columnCount, rowCount }: { columnCount: number; 
 					))}
 				</div>
 			</div>
+			<div className="flex items-center justify-end space-x-2 py-4">
+				<div className="flex-1 text-sm text-muted-foreground">
+					<Skeleton className="w-3xs h-5" />
+				</div>
+				<div className="space-x-2">
+					<Button
+						variant="outline"
+						size="sm"
+						disabled
+					>
+						Previous
+					</Button>
+					<Button
+						variant="outline"
+						size="sm"
+						disabled
+					>
+						Next
+					</Button>
+				</div>
+			</div>
 		</div>
 	)
 }

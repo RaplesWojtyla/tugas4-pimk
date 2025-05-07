@@ -34,7 +34,7 @@ export const createMahasiswa = async (mahasiswa: Omit<Mahasiswa, 'id'>) => {
 				return {
 					success: false,
 					status: 409,
-					message: `Data NIM/email sudah ada`
+					message: `Data ${error.meta ? (error.meta.target as Array<string>)[0].toUpperCase() : "NIM/Email"} mahasiswa telah ada`
 				}
 			}
 		}
@@ -102,10 +102,46 @@ export const updateMahasiswa = async (mahasiswa: Mahasiswa) => {
 	} catch (error: any) {
 		console.error(error)
 
+		if (error instanceof Prisma.PrismaClientKnownRequestError) {
+			if (error.code === 'P2002') {
+				return {
+					success: false,
+					status: 409,
+					message: `Data ${error.meta ? (error.meta.target as Array<string>)[0].toUpperCase() : "NIM/Email"} mahasiswa telah ada`
+				}
+			}
+		}
+
 		return {
 			success: false,
 			status: 500,
 			message: 'Gagal merubah data mahasiswa'
 		}
-	}  
+	}
+}
+
+export const deleteMahasiswa = async (id: string) => {
+	try {
+		await prisma.mahasiswa.delete({
+			where: {
+				id: id
+			}
+		})
+
+		revalidatePath('/')
+
+		return {
+			success: true,
+			status: 200,
+			message: 'Berhasil menghapus data mahasiswa'
+		}
+	} catch (e: any) {
+		console.error(e)
+
+		return {
+			success: false,
+			status: 500,
+			message: 'Gagal menghapus data mahasiswa.'
+		}
+	}
 }
