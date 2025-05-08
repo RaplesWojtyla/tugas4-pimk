@@ -50,81 +50,27 @@ const Home = () => {
 	}
 
 	const onDeleteMahasiswa = (id: string) => {
-		setDataMahasiswa(prev => 
+		setDataMahasiswa(prev =>
 			prev.filter(obj => obj.id !== id)
 		)
 	}
 
 	return (
-		<div className="flex flex-col min-h-screen p-4 sm:p-8 font-[family-name:var(--font-geist-sans)]">
-			<header className="w-full border-b py-4 mb-6">
-				<div className="mx-auto max-w-6xl flex items-center justify-between px-4 sm:px-8">
-					<h1 className="text-xl font-bold tracking-tight text-primary">
-						Sistem Data Mahasiswa
-					</h1>
-					<nav className="flex items-center text-sm text-muted-foreground space-x-1">
-						<Link href="/" className="hover:underline hover:underline-offset-4">
-							Home
-						</Link>
-						<span>/</span>
-						<span className="text-foreground">Dashboard</span>
-					</nav>
-				</div>
-			</header>
-
-			<main className="flex-1 w-full overflow-auto">
-				<div className="mx-auto max-w-6xl">
-					<div className="w-full">
-						<AddNewMahasiswa onSuccess={onAddMahasiswa} />
-						{isLoading ? (
-							<SkeletonTable
-								columnCount={6}
-								rowCount={7}
-							/>
-						) : (
-							<DataTable
-								data={dataMahasiswa}
-								columns={columns(onUpdateMahasiswa, onDeleteMahasiswa)}
-							/>
-						)}
-					</div>
-				</div>
-			</main>
-
-
-			<footer className="mt-8 flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
-				<p>© {new Date().getFullYear()} Patra Rafles Wostyla Sinaga. All rights reserved.</p>
-				<Link
-					href="https://github.com/RaplesWojtyla"
-					target="_blank"
-					rel="noopener noreferrer"
-					className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-				>
-					<Image
-						src="/github.png"
-						alt="GitHub icon"
-						width={16}
-						height={16}
-						aria-hidden
+		<div className="mx-auto max-w-6xl">
+			<div className="w-full">
+				<AddNewMahasiswa onSuccess={onAddMahasiswa} />
+				{isLoading ? (
+					<SkeletonTable
+						columnCount={6}
+						rowCount={7}
 					/>
-					GitHub
-				</Link>
-				<Link
-					href="https://www.linkedin.com/in/wojtylakarma"
-					target="_blank"
-					rel="noopener noreferrer"
-					className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-				>
-					<Image
-						src="/linkedin.png"
-						alt="LinkedIn icon"
-						width={16}
-						height={16}
-						aria-hidden
+				) : (
+					<DataTable
+						data={dataMahasiswa}
+						columns={columns(onUpdateMahasiswa, onDeleteMahasiswa)}
 					/>
-					LinkedIn
-				</Link>
-			</footer>
+				)}
+			</div>
 		</div>
 	);
 }

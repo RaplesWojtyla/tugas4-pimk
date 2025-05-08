@@ -7,6 +7,7 @@ import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMe
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import React, { useState } from "react"
+import { SignInButton, useAuth } from "@clerk/nextjs"
 
 
 interface DataTableProps<TData, TValue> {
@@ -19,6 +20,8 @@ export const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 	const [rowSelection, setRowSelection] = useState({})
+
+	const { isSignedIn } = useAuth()
 
 	const table = useReactTable({
 		data,
@@ -41,7 +44,7 @@ export const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData
 
 
 	return (
-		<>	
+		<>
 			<div className="flex items-center py-4">
 				<Input
 					placeholder="Cari NIM mahasiswa..."
@@ -94,29 +97,46 @@ export const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData
 						))}
 					</TableHeader>
 					<TableBody>
-						{table.getRowModel().rows?.length ? (
-							table.getRowModel().rows.map((row) => (
-								<TableRow
-									key={row.id}
-									data-state={row.getIsSelected() && "selected"}
-								>
-									{row.getVisibleCells().map((cell) => (
-										<TableCell key={cell.id}>
-											{flexRender(
-												cell.column.columnDef.cell,
-												cell.getContext()
-											)}
-										</TableCell>
-									))}
+						{isSignedIn ? (
+							table.getRowModel().rows?.length ? (
+								table.getRowModel().rows.map((row) => (
+									<TableRow
+										key={row.id}
+										data-state={row.getIsSelected() && "selected"}
+									>
+										{row.getVisibleCells().map((cell) => (
+											<TableCell key={cell.id}>
+												{flexRender(
+													cell.column.columnDef.cell,
+													cell.getContext()
+												)}
+											</TableCell>
+										))}
+									</TableRow>
+								))
+							) : (
+								<TableRow>
+									<TableCell
+										colSpan={columns.length}
+										className="h-24 text-center"
+									>
+										Tidak ada data mahasiswa.
+									</TableCell>
 								</TableRow>
-							))
+							)
 						) : (
 							<TableRow>
 								<TableCell
 									colSpan={columns.length}
 									className="h-24 text-center"
 								>
-									Tidak ada data mahasiswa.
+									Silahkan 
+									<SignInButton mode="modal">
+										<Button variant={'link'}>
+											Login
+										</Button>
+									</SignInButton>
+									untuk melihat data mahasiswa.
 								</TableCell>
 							</TableRow>
 						)}

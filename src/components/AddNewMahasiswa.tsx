@@ -11,6 +11,7 @@ import { useState } from "react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
 import { createMahasiswa } from "@/action/mahasiswa.action";
 import toast from 'react-hot-toast'
+import { useAuth } from "@clerk/nextjs";
 
 
 const AddNewMahasiswa = ({ onSuccess } : { onSuccess: (newData: Mahasiswa) => void }) => {
@@ -23,6 +24,7 @@ const AddNewMahasiswa = ({ onSuccess } : { onSuccess: (newData: Mahasiswa) => vo
 		jurusan: "",
 	})
 	const [isLoading, setIsLoading] = useState<boolean>(false)
+	const { isSignedIn } = useAuth()
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { id, value } = e.target
@@ -94,7 +96,7 @@ const AddNewMahasiswa = ({ onSuccess } : { onSuccess: (newData: Mahasiswa) => vo
 		<div className="flex justify-end mb-5">
 			<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 				<DialogTrigger asChild>
-					<Button className="bg-green-500 hover:bg-green-600 transition duration-300">
+					<Button className="bg-green-500 hover:bg-green-600 transition duration-300" disabled={!isSignedIn}>
 						Tambah Mahasiswa
 					</Button>
 				</DialogTrigger>
